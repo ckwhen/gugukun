@@ -1,4 +1,8 @@
 import { createTextEcho } from '../utils/string.js';
+import {
+  checkPhraseTypeByMessage,
+  getPhraseText,
+} from '../utils/phrases.js';
 
 export function handleMessage(event, client) {
   const { message } = event;
@@ -7,7 +11,8 @@ export function handleMessage(event, client) {
     return Promise.resolve(null);
   }
 
-  const text = `你說的是：「${message.text}」咕～我還在學習哦咕！`;
+  const phraseType = checkPhraseTypeByMessage(message.text);
+  const text = getPhraseText(phraseType);
 
   return client.replyMessage({
     replyToken: event.replyToken,
