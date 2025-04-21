@@ -1,8 +1,9 @@
 import express from 'express';
-import { handleFollow } from './followHandler.js';
-import { handleMessage } from './messageHandler.js';
+import { WebhookEvent } from '@line/bot-sdk';
+import { handleFollow } from './followHandler';
+import { handleMessage } from './messageHandler';
 
-async function handleEvent(event, client) {
+async function handleEvent(event: WebhookEvent, client: any) {
   switch (event.type) {
     case 'follow':
       return handleFollow(event, client);
@@ -13,12 +14,12 @@ async function handleEvent(event, client) {
   }
 };
 
-export function createWebhookRouter(client) {
+export function createWebhookRouter(client: any) {
   const router = express.Router();
 
   router.post('/', async (req, res) => {
     const events = req.body.events;
-    await Promise.all(events.map(event => handleEvent(event, client)))
+    await Promise.all(events.map((event: WebhookEvent) => handleEvent(event, client)))
       .then((result) => res.json(result))
       .catch((err) => {
         console.error(err);

@@ -1,4 +1,4 @@
-import { PHRASE_TYPES } from './contants.js';
+import { PHRASE_TYPES } from './contants';
 
 const {
   REMINDER,
@@ -43,7 +43,7 @@ const phrases = {
   ]
 };
 
-function getRandom(arr) {
+function getRandom(arr: any[]) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 

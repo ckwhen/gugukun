@@ -1,10 +1,12 @@
-import { createTextEcho } from '../utils/string.js';
+import { MessageEvent } from '@line/bot-sdk';
+import { LineText } from '../interfaces';
+import { createTextEcho } from '../utils/string';
 import {
   checkPhraseTypeByMessage,
   getPhraseText,
-} from '../utils/phrases.js';
+} from '../utils/phrases';
 
-export function handleMessage(event, client) {
+export function handleMessage(event: MessageEvent, client: any) {
   const { message } = event;
 
   if (message.type !== 'text') {
@@ -12,7 +14,7 @@ export function handleMessage(event, client) {
   }
 
   const phraseType = checkPhraseTypeByMessage(message.text);
-  const text = getPhraseText(phraseType);
+  const text: LineText = getPhraseText(phraseType);
 
   return client.replyMessage({
     replyToken: event.replyToken,

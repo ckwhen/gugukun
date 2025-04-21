@@ -1,7 +1,9 @@
-import { createTextEcho } from '../utils/string.js';
+import { FollowEvent } from '@line/bot-sdk';
+import { LinesText } from '../interfaces';
+import { createTextEcho } from '../utils/string';
 
-export function handleFollow(event, client) {
-  const lines = [
+export function handleFollow(event: FollowEvent, client: any) {
+  const lines: LinesText = [
     '你好咕～我是喝水咕嚕咕嚕地咕咕君 🐣💧',
     '每天都會提醒你補充水分咕！',
     '',
