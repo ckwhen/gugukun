@@ -2,6 +2,7 @@
   "name": "gugukun",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "private": true,
   "scripts": {
     "dev": "nodemon ./app/index.js"

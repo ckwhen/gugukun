@@ -1,7 +1,7 @@
-require('dotenv').config();
-const express = require('express');
-const line = require('@line/bot-sdk');
-
+import 'dotenv/config'
+import express from 'express';
+import * as line from '@line/bot-sdk';
+import { createWebhookRouter } from './webhook/router.js';
 
 const port = process.env.PORT;
 // create LINE SDK config from env variables
@@ -16,43 +16,8 @@ const client = new line.messagingApi.MessagingApiClient({
 const app = express();
 
 // entry
-app.post('/callback', line.middleware(config), (req, res) => {
-  Promise
-    .all(req.body.events.map(handleEvent))
-    .then((result) => res.json(result))
-    .catch((err) => {
-      console.error(err);
-      res.status(500).end();
-    });
-});
-
-// event handler
-function handleEvent(event) {
-  if (event.type === 'follow') {
-    const echo = {
-      type: 'text',
-      text: '你好咕～我是喝水咕嚕咕嚕的咕咕君，是你的每日喝水提醒小雞咕💧',
-    };
-    return client.replyMessage({
-      replyToken: event.replyToken,
-      messages: [echo],
-    });
-  }
-
-
-  if (event.type !== 'message' || event.message.type !== 'text') {
-    return Promise.resolve(null);
-  }
-  console.log(`event: ${event.message.text}`);
-
-  const echo = { type: 'text', text: event.message.text };
-
-  return client.replyMessage({
-    replyToken: event.replyToken,
-    messages: [echo],
-  });
-}
+app.use('/webhook', line.middleware(config), createWebhookRouter(client));
 
 app.listen(port, () => {
-  console.log(`咕咕君正關注著～ port:${port}咕`);
+  console.log(`咕咕君已啟動在 http://localhost:${port} 咕！`);
 });
