@@ -1,15 +1,19 @@
-export const PHRASE_TYPES = {
-  REMINDER: Symbol('Reminder'),
-  RECORD: Symbol('Record'),
-  SET_WATER_AMOUNT_GOAL: Symbol('Set Water Amount Goal'),
-  SET_WEIGHT_GOAL: Symbol('Set Weight Goal'),
-  CHECK_GOAL: Symbol('Check Goal'),
-  ENCOURAGE: Symbol('Encourage'),
-  MILESTONE: Symbol('Milestone'),
-  OVERLIMIT: Symbol('Overlimit'),
-  RESET: Symbol('Reset'),
-  DEFAULT: Symbol('Default'),
-  UNKNOWN: Symbol('Unknown'),
+export enum PHRASE_TYPES {
+  SET_GOAL,
+  CHECK_GOAL,
+  CHECK_CURRENT,
+  RECORD_WALTER,
+  REMINDER,
+  ENCOURAGE,
+  DEFAULT,
+  UNKNOWN,
 };
 
 export const AMOUNT_PER_WEIGHT = 30;
+
+export const rules = {
+  setting: /設定.*?(\d+).*?(ml|cc|kg)/i,
+  goalChecking: /(查詢|目標)/i,
+  currentChecking: /進度/i,
+  walterRecording: /(喝水|喝了).*(\d+)(ml|cc)?/i,
+};

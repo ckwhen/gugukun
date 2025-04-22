@@ -1,8 +1,18 @@
 import { FollowEvent } from '@line/bot-sdk';
-import { LinesText } from '../interfaces';
+import { LinesText } from '../types';
 import { createTextEcho } from '../utils/string';
+import { db } from '../db/pool';
+import { UserRepository } from '../db/repositories';
+import { UserService } from '../domain/services';
+
+const userRepo = new UserRepository(db);
+const userService = new UserService(userRepo);
 
 export function handleFollow(event: FollowEvent, client: any) {
+  const {
+    source: { userId },
+  } = event;
+
   const lines: LinesText = [
     '你好咕～我是喝水咕嚕咕嚕地咕咕君 🐣💧',
     '每天都會提醒你補充水分咕！',
@@ -16,6 +26,8 @@ export function handleFollow(event: FollowEvent, client: any) {
     '每日飲水量 2000cc',
     '體重 60kg',
   ];
+
+  userId && userService.handleUserCreate(userId);
 
   return client.replyMessage({
     replyToken: event.replyToken,
