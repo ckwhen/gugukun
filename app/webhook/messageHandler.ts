@@ -3,7 +3,7 @@ import { LineText } from '../types';
 import { PHRASE_TYPES } from '../utils/contants';
 import { createTextEcho } from '../utils/string';
 import { db } from '../db/pool';
-import { UserRepository } from '../db/repositories';
+import { UserRepository, WaterLogRepository } from '../db/repositories';
 import { UserService } from '../domain/services';
 import {
   checkPhraseTypeByMessage,
@@ -11,9 +11,10 @@ import {
 } from '../utils/phrases';
 
 const userRepo = new UserRepository(db);
-const userService = new UserService(userRepo);
+const waterLogRepo = new WaterLogRepository(db);
+const userService = new UserService(userRepo, waterLogRepo);
 
-export function handleMessage(event: MessageEvent, client: any) {
+export async function handleMessage(event: MessageEvent, client: any) {
   const {
     message,
     source: { userId },
@@ -27,10 +28,22 @@ export function handleMessage(event: MessageEvent, client: any) {
   const phraseType = checkPhraseTypeByMessage(messageText);
   let text: LineText = getPhraseTextByType(phraseType);
 
-  if (phraseType === PHRASE_TYPES.SET_GOAL) {
-    userId && userService.handleUserSetting(userId, messageText);
+  if (userId && phraseType === PHRASE_TYPES.SET_GOAL) {
+    userService.handleUserSetting(userId, messageText);
   }
-  
+
+  if (userId && phraseType === PHRASE_TYPES.RECORD_WATER) {
+    const amount = await userService.handleWaterLogCreate(userId, messageText);
+
+    text = getPhraseTextByType(phraseType, { cc: amount });
+  }
+
+  if (userId && phraseType === PHRASE_TYPES.CHECK_CURRENT) {
+    const total = await userService.handleTodayTotalWater(userId);
+
+    text = getPhraseTextByType(phraseType, { cc: total });
+  }
+
   return client.replyMessage({
     replyToken: event.replyToken,
     messages: [ createTextEcho(`${userId}: ${text}`) ],

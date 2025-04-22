@@ -1,16 +1,23 @@
-import { UserEntity } from './entities';
-import { IUserRepository } from './interfaces';
-import { RuleMatch } from '../types';
+import {
+  UserEntity,
+  UserId,
+  WaterLogEntity,
+} from './entities';
+import { IUserRepository, IWaterLogRepository } from './interfaces';
+import { RuleMatch, EventTextMessage } from '../types';
 import { rules, AMOUNT_PER_WEIGHT } from '../utils/contants';
 
 export class UserService {
-  constructor(private readonly repo: IUserRepository) {}
+  constructor(
+    private readonly userRepo: IUserRepository,
+    private readonly waterLogRepo: IWaterLogRepository
+  ) {}
 
-  async handleUserCreate(userId: string) {
-    await this.repo.create(<UserEntity>{ id: userId });
+  async handleUserCreate(userId: UserId) {
+    await this.userRepo.create(<UserEntity>{ id: userId });
   }
 
-  async handleUserSetting(userId: string, message: string) {
+  async handleUserSetting(userId: UserId, message: EventTextMessage) {
     const match: RuleMatch = message.match(rules.setting);
     let amount = 0;
     let unit = 'cc';
@@ -28,9 +35,28 @@ export class UserService {
     if (unit === 'kg') {
       targetWater = AMOUNT_PER_WEIGHT * amount;
 
-      await this.repo.updateWeight(userId, amount);
+      await this.userRepo.updateWeight(userId, amount);
     }
 
-    await this.repo.updateTargetWater(userId, targetWater);
+    await this.userRepo.updateTargetWater(userId, targetWater);
+  }
+
+  async handleWaterLogCreate(userId: UserId, message: EventTextMessage) {
+    const match: RuleMatch = message.match(rules.waterRecording);
+    let amount = 0;
+
+    if (match) {
+      amount = parseFloat(match[2]);
+    }
+
+    const logAmount = await this.waterLogRepo.create(<WaterLogEntity>{ userId, amount });
+
+    return logAmount;
+  }
+
+  async handleTodayTotalWater(userId: UserId) {
+    const todayTotal = await this.waterLogRepo.getTodayTotal(userId);
+
+    return todayTotal;
   }
 }

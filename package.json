@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon ./app/index.ts",
     "build": "tsc",
-    "migrate": "ts-node ./scripts/migrate.ts",
+    "migrate": "drizzle-kit push",
     "generate": "drizzle-kit generate"
   },
   "keywords": [],

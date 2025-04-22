@@ -11,8 +11,10 @@ export const users = sqliteTable('users', {
 
 export const waterLogs = sqliteTable('water_logs', {
   id: integer('id').primaryKey({ autoIncrement: true }),
-  userId: text('user_id').references(() => users.id),
-  amount: integer('amount'),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id),
+  amount: integer('amount').notNull(),
   createdAt: text('created_at').default(new Date().toISOString()),
 });
 

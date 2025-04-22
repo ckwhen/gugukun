@@ -2,11 +2,12 @@ import { FollowEvent } from '@line/bot-sdk';
 import { LinesText } from '../types';
 import { createTextEcho } from '../utils/string';
 import { db } from '../db/pool';
-import { UserRepository } from '../db/repositories';
+import { UserRepository, WaterLogRepository } from '../db/repositories';
 import { UserService } from '../domain/services';
 
 const userRepo = new UserRepository(db);
-const userService = new UserService(userRepo);
+const waterLogRepo = new WaterLogRepository(db);
+const userService = new UserService(userRepo, waterLogRepo);
 
 export function handleFollow(event: FollowEvent, client: any) {
   const {

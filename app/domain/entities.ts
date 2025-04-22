@@ -1,5 +1,12 @@
+export type UserId = string;
+
 export interface UserEntity {
-  id: string;
+  id: UserId;
   weight?: number | null;
   targetWater?: number | null;
+}
+
+export interface WaterLogEntity {
+  userId: UserId,
+  amount: number;
 }
