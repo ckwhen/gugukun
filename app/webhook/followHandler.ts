@@ -1,6 +1,8 @@
 import { FollowEvent } from '@line/bot-sdk';
 import { LinesText } from '../types';
 import { createTextEcho } from '../utils/string';
+import { PHRASE_TYPES } from '../utils/contants';
+import { getPhraseTextByType } from '../utils/phrases';
 import { db } from '../db/pool';
 import { UserRepository, WaterLogRepository } from '../db/repositories';
 import { UserService } from '../domain/services';
@@ -24,14 +26,21 @@ export function handleFollow(event: FollowEvent, client: any) {
     '我會幫你算出建議飲水量哦咕！',
     '',
     '把下面的文字複製後修改吧咕！',
-    '每日飲水量 2000cc',
-    '體重 60kg',
+    '設定 2000cc',
+    '設定 60kg',
+  ];
+  const helpLines: LinesText = [
+    '另外還有這些指令可以參考喔咕',
+    '',
+    getPhraseTextByType(PHRASE_TYPES.GET_HELP),
+    '',
+    '未來如果忘記了咕，輸入 help 我就會提醒你摟咕',
   ];
 
   userId && userService.handleUserCreate(userId);
 
   return client.replyMessage({
     replyToken: event.replyToken,
-    messages: [ createTextEcho(lines) ],
+    messages: [ createTextEcho(lines), createTextEcho(helpLines) ],
   });
 };

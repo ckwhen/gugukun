@@ -7,6 +7,7 @@ export enum PHRASE_TYPES {
   ENCOURAGE,
   DEFAULT,
   UNKNOWN,
+  GET_HELP,
 };
 
 export const CHUNK_SIZE: number = 5;
@@ -18,4 +19,5 @@ export const rules = {
   goalChecking: /(查詢|目標)/i,
   currentChecking: /進度/i,
   waterRecording: /(喝水|喝了).*?(\d+)(ml|cc)?/i,
+  help: /help/i,
 };

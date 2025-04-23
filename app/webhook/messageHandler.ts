@@ -1,5 +1,5 @@
 import { MessageEvent } from '@line/bot-sdk';
-import { LineText } from '../types';
+import { LineText, LinesText } from '../types';
 import { PHRASE_TYPES } from '../utils/contants';
 import { createTextEcho } from '../utils/string';
 import { db } from '../db/pool';
@@ -26,7 +26,7 @@ export async function handleMessage(event: MessageEvent, client: any) {
 
   const { text: messageText } = message;
   const phraseType = checkPhraseTypeByMessage(messageText);
-  let text: LineText = getPhraseTextByType(phraseType);
+  let text: LinesText | LineText = getPhraseTextByType(phraseType);
 
   if (userId && phraseType === PHRASE_TYPES.SET_GOAL) {
     userService.handleUserSetting(userId, messageText);
@@ -44,8 +44,17 @@ export async function handleMessage(event: MessageEvent, client: any) {
     text = getPhraseTextByType(phraseType, { cc: total });
   }
 
+  if (phraseType === PHRASE_TYPES.GET_HELP) {
+    text = [
+      '咕咕～咕咕君來提醒你摟咕',
+      '只要輸入 help 我都會出現喔咕',
+      '',
+      getPhraseTextByType(phraseType),
+    ];
+  }
+
   return client.replyMessage({
     replyToken: event.replyToken,
-    messages: [ createTextEcho(`${userId}: ${text}`) ],
+    messages: [ createTextEcho(text) ],
   });
 };

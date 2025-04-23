@@ -20,8 +20,6 @@ const lineClient = new line.messagingApi.MessagingApiClient(
 
 const app = express();
 
-setupReminderScheduler();
-
 // entry
 app.use('/webhook',
   line.middleware(lineMiddlewareConfig),
@@ -30,4 +28,5 @@ app.use('/webhook',
 
 app.listen(port, () => {
   console.log(`咕咕君已啟動在 http://localhost:${port} 咕！`);
+  setupReminderScheduler();
 });
