@@ -7,7 +7,8 @@
     "dev": "nodemon ./app/index.ts",
     "build": "tsc",
     "migrate": "drizzle-kit push",
-    "generate": "drizzle-kit generate"
+    "generate": "drizzle-kit generate",
+    "seed": "ts-node ./app/db/seeds.ts"
   },
   "keywords": [],
   "author": "",
@@ -16,14 +17,19 @@
   "dependencies": {
     "@libsql/client": "^0.15.4",
     "@line/bot-sdk": "^9.8.0",
+    "axios": "^1.8.4",
     "bindings": "^1.5.0",
     "dotenv": "^16.5.0",
     "drizzle-orm": "^0.42.0",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "lodash": "^4.17.21",
+    "node-cron": "^3.0.3"
   },
   "devDependencies": {
     "@types/express": "^5.0.1",
+    "@types/lodash": "^4.17.16",
     "@types/node": "^22.14.1",
+    "@types/node-cron": "^3.0.11",
     "drizzle-kit": "^0.31.0",
     "nodemon": "^3.1.9",
     "ts-node": "^10.9.2",

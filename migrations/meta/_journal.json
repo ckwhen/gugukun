@@ -15,6 +15,13 @@
       "when": 1745327177122,
       "tag": "0001_tiny_sunfire",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1745386756599,
+      "tag": "0002_wild_phantom_reporter",
+      "breakpoints": true
     }
   ]
 }

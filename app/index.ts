@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import * as line from '@line/bot-sdk';
 import { createWebhookRouter } from './webhook/router';
+import { setupReminderScheduler } from './schedules/reminder';
 
 dotenv.config();
 
@@ -18,6 +19,8 @@ const lineClient = new line.messagingApi.MessagingApiClient(
 );
 
 const app = express();
+
+setupReminderScheduler();
 
 // entry
 app.use('/webhook',

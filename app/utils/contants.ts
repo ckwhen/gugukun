@@ -9,6 +9,8 @@ export enum PHRASE_TYPES {
   UNKNOWN,
 };
 
+export const CHUNK_SIZE: number = 5;
+
 export const AMOUNT_PER_WEIGHT = 30;
 
 export const rules = {

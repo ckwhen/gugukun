@@ -42,6 +42,12 @@ export class UserRepository implements IUserRepository {
 
     return result[0] || null;
   }
+
+  async getAll(): Promise<UserEntity[]> {
+    const results = await this.db.select().from(users);
+
+    return results;
+  }
 }
 
 const today = new Date().toISOString().slice(0, 10);

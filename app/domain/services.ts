@@ -60,3 +60,15 @@ export class UserService {
     return todayTotal;
   }
 }
+
+export class ReminderService {
+  constructor(
+    private readonly userRepo: IUserRepository
+  ) {}
+
+  async getAllUsers() {
+    const users = await this.userRepo.getAll();
+
+    return users;
+  }
+}
