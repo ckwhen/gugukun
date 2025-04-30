@@ -1,17 +1,13 @@
 import { MessageEvent } from '@line/bot-sdk';
 import { LineText, LinesText } from '../types';
 import { contants, phrases, strings } from '../utils';
-import { db } from '../db/client';
-import { UserRepository, WaterLogRepository } from '../db/repositories';
-import { UserService } from '../domain/services';
+import { createUserService } from '../domain/services';
 
 const { createTextEcho } = strings;
 const { PHRASE_TYPES } = contants;
 const { getPhraseTextByType, checkPhraseTypeByMessage } = phrases;
 
-const userRepo = new UserRepository(db);
-const waterLogRepo = new WaterLogRepository(db);
-const userService = new UserService(userRepo, waterLogRepo);
+const userService = createUserService();
 
 export async function handleMessage(event: MessageEvent, client: any) {
   const {

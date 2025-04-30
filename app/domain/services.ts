@@ -3,13 +3,15 @@ import {
   UserId,
   WaterLogEntity,
 } from './entities';
+import { db } from '../db/client';
+import { UserRepository, WaterLogRepository } from '../db/repositories';
 import { IUserRepository, IWaterLogRepository } from './interfaces';
 import { RuleMatch, EventTextMessage } from '../types';
 import { contants } from '../utils';
 
 const { rules, AMOUNT_PER_WEIGHT } = contants;
 
-export class UserService {
+class UserService {
   constructor(
     private readonly userRepo: IUserRepository,
     private readonly waterLogRepo: IWaterLogRepository
@@ -67,6 +69,13 @@ export class UserService {
 
     return todayTotal;
   }
+}
+
+export function createUserService(): UserService {
+  const userRepo = new UserRepository(db);
+  const waterLogRepo = new WaterLogRepository(db);
+
+  return new UserService(userRepo, waterLogRepo);
 }
 
 export class ReminderService {
