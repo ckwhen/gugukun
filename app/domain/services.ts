@@ -5,7 +5,9 @@ import {
 } from './entities';
 import { IUserRepository, IWaterLogRepository } from './interfaces';
 import { RuleMatch, EventTextMessage } from '../types';
-import { rules, AMOUNT_PER_WEIGHT } from '../utils/contants';
+import { contants } from '../utils';
+
+const { rules, AMOUNT_PER_WEIGHT } = contants;
 
 export class UserService {
   constructor(

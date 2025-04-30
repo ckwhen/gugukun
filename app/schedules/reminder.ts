@@ -5,10 +5,12 @@ import { db } from '../db/client';
 import { UserRepository } from '../db/repositories';
 import { ReminderService } from '../domain/services';
 import { UserEntity, UserId } from '../domain/entities';
-import { PHRASE_TYPES, CHUNK_SIZE } from '../utils/contants';
-import { getPhraseTextByType } from '../utils/phrases';
+import { contants, phrases } from '../utils';
 import { getLineChannel } from '../configs';
 import { AxiosHttpClientAdapter, LineMessageAdapter } from '../adapters';
+
+const { PHRASE_TYPES, CHUNK_SIZE } = contants;
+const { getPhraseTextByType } = phrases;
 
 const lineChannel = getLineChannel();
 

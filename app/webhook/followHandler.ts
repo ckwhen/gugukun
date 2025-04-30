@@ -1,11 +1,13 @@
 import { FollowEvent } from '@line/bot-sdk';
 import { LinesText } from '../types';
-import { createTextEcho } from '../utils/string';
-import { PHRASE_TYPES } from '../utils/contants';
-import { getPhraseTextByType } from '../utils/phrases';
+import { contants, phrases, strings } from '../utils';
 import { db } from '../db/client';
 import { UserRepository, WaterLogRepository } from '../db/repositories';
 import { UserService } from '../domain/services';
+
+const { createTextEcho } = strings;
+const { PHRASE_TYPES } = contants;
+const { getPhraseTextByType } = phrases;
 
 const userRepo = new UserRepository(db);
 const waterLogRepo = new WaterLogRepository(db);

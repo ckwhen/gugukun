@@ -1,3 +1,7 @@
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 export function getDatabaseUrl() {
   const {
     DB_USER,

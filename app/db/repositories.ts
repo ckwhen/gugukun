@@ -1,5 +1,6 @@
-import { eq, sql } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { users, waterLogs } from './schemas';
+import { sum, equalToday } from './sql-helpers';
 import {
   UserEntity,
   UserId,
@@ -46,8 +47,6 @@ export class UserRepository implements IUserRepository {
   }
 }
 
-const today = new Date().toISOString().slice(0, 10);
-
 export class WaterLogRepository implements IWaterLogRepository {
   constructor(private readonly db: any) {}
 
@@ -60,11 +59,13 @@ export class WaterLogRepository implements IWaterLogRepository {
   }
 
   async getTodayTotal(id: UserId) {
-    const result = await this.db.select({ total: sql<number>`sum(${waterLogs.amount})` })
+    const result = await this.db.select({ total: sum(waterLogs.amount) })
       .from(waterLogs)
-      .where(sql`${waterLogs.userId} = ${id} AND ${waterLogs.createdAt} LIKE ${today + '%'}`)
-      .get();
+      .where(and(
+        eq(waterLogs.userId, id),
+        equalToday(waterLogs.createdAt)
+      ));
 
-    return result?.total ?? 0;
+    return Number(result[0]?.total) ?? 0;
   }
 }
