@@ -4,19 +4,12 @@ import { LineText } from '../types';
 import { createReminderService } from '../domain/services';
 import { UserEntity, UserId } from '../domain/entities';
 import { contants, phrases } from '../utils';
-import { getLineChannel } from '../configs';
-import { AxiosHttpClientAdapter, LineMessageAdapter } from '../adapters';
+import { createLineMessageAdapter } from '../adapters';
 
 const { PHRASE_TYPES, CHUNK_SIZE } = contants;
 const { getPhraseTextByType } = phrases;
 
-const lineChannel = getLineChannel();
-
-const lineMessenger = new LineMessageAdapter(
-  lineChannel.accessToken,
-  new AxiosHttpClientAdapter()
-);
-
+const lineMessenger = createLineMessageAdapter();
 const reminderService = createReminderService();
 
 async function sendReminderToUser(userId: UserId) {

@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import { getLineChannel } from './configs';
 import { UserId } from './domain/entities';
 import { IHttpClient, ILineMessenger } from './domain/interfaces';
 import { LineChannelAccessToken } from './types';
@@ -11,7 +12,7 @@ export class AxiosHttpClientAdapter implements IHttpClient {
   }
 }
 
-export class LineMessageAdapter implements ILineMessenger {
+class LineMessageAdapter implements ILineMessenger {
   private readonly api: string = 'https://api.line.me/v2/bot/message/push';
 
   constructor(
@@ -34,4 +35,13 @@ export class LineMessageAdapter implements ILineMessenger {
         }
       );
   }
+}
+
+const lineChannel = getLineChannel();
+
+export function createLineMessageAdapter(): LineMessageAdapter {
+  return new LineMessageAdapter(
+    lineChannel.accessToken,
+    new AxiosHttpClientAdapter()
+  );
 }
