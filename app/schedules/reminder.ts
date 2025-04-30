@@ -1,9 +1,7 @@
 import * as cron from 'node-cron';
 import chunk from 'lodash/chunk';
 import { LineText } from '../types';
-import { db } from '../db/client';
-import { UserRepository } from '../db/repositories';
-import { ReminderService } from '../domain/services';
+import { createReminderService } from '../domain/services';
 import { UserEntity, UserId } from '../domain/entities';
 import { contants, phrases } from '../utils';
 import { getLineChannel } from '../configs';
@@ -19,9 +17,7 @@ const lineMessenger = new LineMessageAdapter(
   new AxiosHttpClientAdapter()
 );
 
-const userRepo = new UserRepository(db);
-const reminderService = new ReminderService(userRepo);
-
+const reminderService = createReminderService();
 
 async function sendReminderToUser(userId: UserId) {
   const text: LineText = getPhraseTextByType(PHRASE_TYPES.REMINDER);

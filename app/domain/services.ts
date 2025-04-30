@@ -78,7 +78,7 @@ export function createUserService(): UserService {
   return new UserService(userRepo, waterLogRepo);
 }
 
-export class ReminderService {
+class ReminderService {
   constructor(
     private readonly userRepo: IUserRepository
   ) {}
@@ -88,4 +88,10 @@ export class ReminderService {
 
     return users;
   }
+}
+
+export function createReminderService(): ReminderService {
+  const userRepo = new UserRepository(db);
+
+  return new ReminderService(userRepo);
 }
