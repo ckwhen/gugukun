@@ -3,7 +3,7 @@ import { LinesText } from '../types';
 import { createTextEcho } from '../utils/string';
 import { PHRASE_TYPES } from '../utils/contants';
 import { getPhraseTextByType } from '../utils/phrases';
-import { db } from '../db/pool';
+import { db } from '../db/client';
 import { UserRepository, WaterLogRepository } from '../db/repositories';
 import { UserService } from '../domain/services';
 

@@ -2,7 +2,7 @@ import { MessageEvent } from '@line/bot-sdk';
 import { LineText, LinesText } from '../types';
 import { PHRASE_TYPES } from '../utils/contants';
 import { createTextEcho } from '../utils/string';
-import { db } from '../db/pool';
+import { db } from '../db/client';
 import { UserRepository, WaterLogRepository } from '../db/repositories';
 import { UserService } from '../domain/services';
 import {
@@ -30,6 +30,12 @@ export async function handleMessage(event: MessageEvent, client: any) {
 
   if (userId && phraseType === PHRASE_TYPES.SET_GOAL) {
     userService.handleUserSetting(userId, messageText);
+  }
+
+  if (userId && phraseType === PHRASE_TYPES.CHECK_GOAL) {
+    const user = await userService.handleUserFind(userId);
+
+    text = getPhraseTextByType(phraseType, { cc: user?.targetWater });
   }
 
   if (userId && phraseType === PHRASE_TYPES.RECORD_WATER) {

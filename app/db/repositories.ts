@@ -16,29 +16,25 @@ export class UserRepository implements IUserRepository {
   async create(user: UserEntity) {
     await this.db.insert(users)
       .values(user)
-      .onConflictDoNothing()
-      .run();
+      .onConflictDoNothing();
   }
 
   async updateWeight(id: UserId, weight: number) {
     await this.db.update(users)
       .set({ weight })
-      .where(eq(users.id, id))
-      .run();
+      .where(eq(users.id, id));
   }
 
   async updateTargetWater(id: UserId, target: number) {
     await this.db.update(users)
       .set({ targetWater: target })
-      .where(eq(users.id, id))
-      .run();
+      .where(eq(users.id, id));
   }
 
   async findById(id: UserId): Promise<UserEntity | null> {
     const result = await this.db.select()
       .from(users)
-      .where(eq(users.id, id))
-      .all();
+      .where(eq(users.id, id));
 
     return result[0] || null;
   }

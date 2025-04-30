@@ -1,4 +1,4 @@
-import { db } from './pool';
+import { db } from './client';
 import { users, waterLogs } from './schemas';
 
 async function seed() {

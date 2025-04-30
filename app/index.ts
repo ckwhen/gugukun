@@ -1,26 +1,24 @@
-import dotenv from 'dotenv'; 
 import express from 'express';
 import * as line from '@line/bot-sdk';
+import { getLineChannel } from './configs';
 import { createWebhookRouter } from './webhook/router';
 import { setupReminderScheduler } from './schedules/reminder';
 
-dotenv.config();
+const lineChannel = getLineChannel();
 
-const port = process.env.PORT;
-// create LINE SDK config from env variables
+const port = process.env.PORT || 3000;
+
 const lineMiddlewareConfig = <line.MiddlewareConfig>{
-  channelSecret: process.env.CHANNEL_SECRET,
+  channelSecret: lineChannel.secret,
 };
-// create LINE SDK client
 const lineClient = new line.messagingApi.MessagingApiClient(
   <line.ClientConfig>{
-    channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN
+    channelAccessToken: lineChannel.accessToken,
   }
 );
 
 const app = express();
 
-// entry
 app.use('/webhook',
   line.middleware(lineMiddlewareConfig),
   createWebhookRouter(lineClient)

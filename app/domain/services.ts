@@ -17,6 +17,12 @@ export class UserService {
     await this.userRepo.create(<UserEntity>{ id: userId });
   }
 
+  async handleUserFind(userId: UserId) {
+    const user = await this.userRepo.findById(userId);
+
+    return user;
+  }
+
   async handleUserSetting(userId: UserId, message: EventTextMessage) {
     const match: RuleMatch = message.match(rules.setting);
     let amount = 0;

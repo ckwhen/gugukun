@@ -191,4 +191,7 @@ dist
 
 *.db
 
+# db backup
+.exports/
+
 # End of https://www.toptal.com/developers/gitignore/api/node,macos,git

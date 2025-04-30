@@ -1,19 +1,19 @@
 import * as cron from 'node-cron';
-import dotenv from 'dotenv';
 import chunk from 'lodash/chunk';
 import { LineText } from '../types';
-import { db } from '../db/pool';
+import { db } from '../db/client';
 import { UserRepository } from '../db/repositories';
 import { ReminderService } from '../domain/services';
 import { UserEntity, UserId } from '../domain/entities';
 import { PHRASE_TYPES, CHUNK_SIZE } from '../utils/contants';
 import { getPhraseTextByType } from '../utils/phrases';
+import { getLineChannel } from '../configs';
 import { AxiosHttpClientAdapter, LineMessageAdapter } from '../adapters';
 
-dotenv.config();
+const lineChannel = getLineChannel();
 
 const lineMessenger = new LineMessageAdapter(
-  `${process.env.CHANNEL_ACCESS_TOKEN}`,
+  lineChannel.accessToken,
   new AxiosHttpClientAdapter()
 );
 
@@ -42,9 +42,9 @@ async function runJobWithUsers(jobFn: (userId: UserId) => Promise<void>, label: 
 export async function setupReminderScheduler() {
   console.log('Setting up daily reminder jobs...');
 
-  cron.schedule('0 8 * * * * 1-5', () => runJobWithUsers(sendReminderToUser, 'Morning'));
-  cron.schedule('0 12 * * * * 1-5', () => runJobWithUsers(sendReminderToUser, 'Noon'));
-  cron.schedule('0 16 * * * * 1-5', () => runJobWithUsers(sendReminderToUser, 'Afternoon'));
+  cron.schedule('0 0 8 * * 1-5', () => runJobWithUsers(sendReminderToUser, 'Morning'));
+  cron.schedule('0 0 12 * * 1-5', () => runJobWithUsers(sendReminderToUser, 'Noon'));
+  cron.schedule('0 0 16 * * 1-5', () => runJobWithUsers(sendReminderToUser, 'Afternoon'));
 
   console.log('Reminder jobs scheduled.');
 }

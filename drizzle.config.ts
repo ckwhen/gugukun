@@ -1,19 +1,9 @@
-import * as dotenv from 'dotenv';
 import type { Config } from 'drizzle-kit';
-
-dotenv.config();
-
-if (!process.env.LIBSQL_DATABASE_PATH) {
-  throw Error(`process.env.LIBSQL_DATABASE_PATH isn't set!`);
-}
-
-const url = `${process.env.LIBSQL_DATABASE_PATH}`;
+import { getDatabaseUrl } from './app/configs';
 
 export default {
-  schema: './app/db/schemas.ts',
+  schema: ['./app/db/schemas', './app/db/relations'],
   out: './migrations',
-  dialect: 'sqlite',
-  dbCredentials: { url },
-  verbose: true,
-  strict: true,
+  dialect: 'postgresql',
+  dbCredentials: { url: getDatabaseUrl() },
 } satisfies Config;
