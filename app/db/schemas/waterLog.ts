@@ -1,4 +1,5 @@
 import { pgTable, text, integer } from 'drizzle-orm/pg-core';
+import { timestamps } from '../column-helpers';
 import { users } from './user';
 
 export const waterLogs = pgTable('water_logs', {
@@ -7,5 +8,5 @@ export const waterLogs = pgTable('water_logs', {
     .notNull()
     .references(() => users.id),
   amount: integer('amount').notNull(),
-  createdAt: text('created_at').default(new Date().toISOString()),
+  ...timestamps,
 });
