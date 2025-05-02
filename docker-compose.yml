@@ -32,6 +32,16 @@ services:
     volumes:
       - ~/backups/gugukun:/backups
 
+  migrate:
+    build: .
+    restart: "no"
+    depends_on:
+      - db
+    command: [
+      "bash", "-c",
+      "sleep 5 && npm run db:migrate"
+    ]
+
   app:
     build: .
     container_name: gugukun_bot
@@ -51,7 +61,7 @@ services:
         condition: service_healthy
     command: [
       "bash", "-c",
-      "sleep 5 && npx drizzle-kit push && node app/index.js"
+      "sleep 5 && node app/index.js"
     ]
 
 volumes:
