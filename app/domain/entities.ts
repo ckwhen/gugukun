@@ -6,6 +6,11 @@ export interface UserEntity {
   targetWater?: number | null;
 }
 
+export type UserDailyWaterProgress = Pick<UserEntity, 'id' | 'targetWater'> & {
+  totalWaterToday: number | 0;
+  percentage: string;
+};
+
 export interface WaterLogEntity {
   userId: UserId,
   amount: number;
