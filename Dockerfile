@@ -20,4 +20,5 @@ COPY --from=builder /app/package*.json ./
 RUN npm install
 
 COPY --from=builder /app/dist ./app
+COPY --from=builder /app/migrations ./migrations
 COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
