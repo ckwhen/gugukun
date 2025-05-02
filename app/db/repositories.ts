@@ -32,12 +32,12 @@ export class UserRepository implements IUserRepository {
       .where(eq(users.id, id));
   }
 
-  async findById(id: UserId): Promise<UserEntity | null> {
-    const result = await this.db.select()
+  async findById(id: UserId): Promise<UserEntity> {
+    const [ user ] = await this.db.select()
       .from(users)
       .where(eq(users.id, id));
 
-    return result[0] || null;
+    return user;
   }
 
   async getAll(): Promise<UserEntity[]> {
@@ -51,21 +51,23 @@ export class WaterLogRepository implements IWaterLogRepository {
   constructor(private readonly db: any) {}
 
   async create(waterLog: WaterLogEntity) {
-    const result = await this.db.insert(waterLogs)
+    const [ log ] = await this.db.insert(waterLogs)
       .values(waterLog)
       .returning({ amount: waterLogs.amount });
 
-    return result[0]?.amount ?? 0;
+    return log?.amount ?? 0;
   }
 
-  async getTodayTotal(id: UserId) {
-    const result = await this.db.select({ total: sum(waterLogs.amount) })
+  async getTodayWaterLogs(id: UserId) {
+    const logs = await this.db.select()
       .from(waterLogs)
-      .where(and(
-        eq(waterLogs.userId, id),
-        equalToday(waterLogs.createdAt)
-      ));
+      .where(
+        and(
+          eq(waterLogs.userId, id),
+          equalToday(waterLogs.createdAt),
+        )
+      );
 
-    return Number(result[0]?.total) ?? 0;
+    return logs;
   }
 }

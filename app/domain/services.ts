@@ -1,6 +1,7 @@
 import {
   UserEntity,
   UserId,
+  UserDailyWaterProgress,
   WaterLogEntity,
 } from './entities';
 import { db } from '../db/client';
@@ -64,10 +65,22 @@ class UserService {
     return logAmount;
   }
 
-  async handleTodayTotalWater(userId: UserId) {
-    const todayTotal = await this.waterLogRepo.getTodayTotal(userId);
+  async handleUserWaterProgress(userId: UserId): Promise<UserDailyWaterProgress> {
+    const user = await this.userRepo.findById(userId);
+    const todayWaterLogs = await this.waterLogRepo.getTodayWaterLogs(userId);
 
-    return todayTotal;
+    const targetWater = user.targetWater ?? 0;
+    const totalWaterToday = todayWaterLogs
+      .reduce((total, log) => total + log.amount, 0);
+
+    const progress: UserDailyWaterProgress = {
+      totalWaterToday,
+      id: user.id,
+      targetWater: targetWater,
+      percentage: ((totalWaterToday * 100) / targetWater).toFixed(2) + '%',
+    };
+
+    return progress;
   }
 }
 
