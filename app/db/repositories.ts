@@ -1,8 +1,10 @@
 import { eq, and } from 'drizzle-orm';
+import { DB } from './client';
 import { users, waterLogs } from './schemas';
 import { sum, equalToday } from './sql-helpers';
 import {
   UserEntity,
+  UserProfile,
   UserId,
   WaterLogEntity,
 } from '../domain/entities';
@@ -12,12 +14,18 @@ import {
 } from '../domain/interfaces';
 
 export class UserRepository implements IUserRepository {
-  constructor(private readonly db: any) {}
+  constructor(private readonly db: DB) {}
 
   async create(user: UserEntity) {
     await this.db.insert(users)
       .values(user)
       .onConflictDoNothing();
+  }
+
+  async updateProfile(id: UserId, profile: UserProfile) {
+    await this.db.update(users)
+      .set(profile)
+      .where(eq(users.id, id));
   }
 
   async updateWeight(id: UserId, weight: number) {
@@ -48,7 +56,7 @@ export class UserRepository implements IUserRepository {
 }
 
 export class WaterLogRepository implements IWaterLogRepository {
-  constructor(private readonly db: any) {}
+  constructor(private readonly db: DB) {}
 
   async create(waterLog: WaterLogEntity) {
     const [ log ] = await this.db.insert(waterLogs)

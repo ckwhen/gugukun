@@ -1,7 +1,7 @@
 import { MessageEvent } from '@line/bot-sdk';
-import { LineText, LinesText } from '../types';
 import { contants, phrases, strings } from '../utils';
 import { createUserService } from '../domain/services';
+import { getProgressBubbleMessage, ReplyMessageRequestType } from './utils';
 
 const { createTextEcho } = strings;
 const { PHRASE_TYPES } = contants;
@@ -9,7 +9,9 @@ const { getPhraseTextByType, checkPhraseTypeByMessage } = phrases;
 
 const userService = createUserService();
 
-export async function handleMessage(event: MessageEvent, client: any) {
+export async function handleMessage(
+  event: MessageEvent
+): Promise<ReplyMessageRequestType | null> {
   const {
     message,
     source: { userId },
@@ -50,81 +52,11 @@ export async function handleMessage(event: MessageEvent, client: any) {
     } = progress;
 
     messages[0] = getPhraseTextByType(phraseType, { cc: totalWaterToday });
-    messages.push(
-      {
-        "type": "flex",
-        "altText": "This is a Flex Message",
-        "contents": {
-          "type": "bubble",
-          "size": "deca",
-          "header": {
-            "type": "box",
-            "layout": "vertical",
-            "contents": [
-              {
-                "type": "text",
-                "text": "進度",
-                "color": "#ffffff",
-                "align": "start",
-                "size": "md",
-                "gravity": "center"
-              },
-              {
-                "type": "box",
-                "layout": "horizontal",
-                "contents": [
-                  {
-                    "type": "text",
-                    "color": "#ffffff",
-                    "text": percentage
-                  },
-                  {
-                    "type": "text",
-                    "color": "#ffffff",
-                    "text": `${totalWaterToday}/${targetWater}`,
-                    "align": "end"
-                  }
-                ],
-                "margin": "lg"
-              },
-              {
-                "type": "box",
-                "layout": "vertical",
-                "contents": [
-                  {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                      {
-                        "type": "filler"
-                      }
-                    ],
-                    "width": percentage,
-                    "backgroundColor": "#0D8186",
-                    "height": "6px"
-                  }
-                ],
-                "backgroundColor": "#9FD8E36E",
-                "height": "6px",
-                "margin": "md"
-              }
-            ],
-            "backgroundColor": "#27ACB2",
-            "paddingTop": "19px",
-            "paddingAll": "12px",
-            "paddingBottom": "16px"
-          },
-          "styles": {
-            "body": {
-              "separator": false
-            },
-            "footer": {
-              "separator": false
-            }
-          }
-        }
-      }
-    );
+    messages.push(getProgressBubbleMessage({
+      percentage,
+      totalWaterToday,
+      targetWater: targetWater ?? 0,
+    }));
   }
 
   if (phraseType === PHRASE_TYPES.GET_HELP) {
@@ -138,7 +70,7 @@ export async function handleMessage(event: MessageEvent, client: any) {
 
   const [ commonText, ...rest ] = messages;
 
-  return client.replyMessage({
+  return Promise.resolve({
     replyToken: event.replyToken,
     messages: [ createTextEcho(commonText), ...rest ],
   });
