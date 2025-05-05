@@ -1,3 +1,8 @@
+export type {
+  MessagingApiClient as MessagingApiClientType,
+  ReplyMessageRequest as ReplyMessageRequestType,
+} from '@line/bot-sdk/dist/messaging-api/api';
+
 type ProgressProps = {
   percentage: string;
   totalWaterToday: number;
