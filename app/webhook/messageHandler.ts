@@ -1,7 +1,7 @@
 import { MessageEvent } from '@line/bot-sdk';
 import { contants, phrases, strings } from '../utils';
 import { createUserService } from '../domain/services';
-import { getProgressBubbleMessage } from './utils';
+import { getProgressBubbleMessage, ReplyMessageRequestType } from './utils';
 
 const { createTextEcho } = strings;
 const { PHRASE_TYPES } = contants;
@@ -9,7 +9,9 @@ const { getPhraseTextByType, checkPhraseTypeByMessage } = phrases;
 
 const userService = createUserService();
 
-export async function handleMessage(event: MessageEvent, client: any) {
+export async function handleMessage(
+  event: MessageEvent
+): Promise<ReplyMessageRequestType | null> {
   const {
     message,
     source: { userId },
@@ -68,7 +70,7 @@ export async function handleMessage(event: MessageEvent, client: any) {
 
   const [ commonText, ...rest ] = messages;
 
-  return client.replyMessage({
+  return Promise.resolve({
     replyToken: event.replyToken,
     messages: [ createTextEcho(commonText), ...rest ],
   });

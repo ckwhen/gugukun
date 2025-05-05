@@ -80,6 +80,6 @@ export function createLineMiddleware(): RequestHandler {
   return line.middleware(lineMiddlewareConfig);
 }
 
-export function createLineClient(): line.messagingApi.MessagingApiClient {
+export function createLineClient(): MessagingApiClient {
   return new line.messagingApi.MessagingApiClient(lineClientConfig);
 }
