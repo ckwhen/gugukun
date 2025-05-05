@@ -30,12 +30,28 @@ async function runJobWithUsers(jobFn: (userId: UserId) => Promise<void>, label: 
   console.log(`[${label}] Job done at`, new Date().toLocaleTimeString());
 }
 
+const tzConfig = {
+  timezone: 'Asia/Taipei',
+};
+
 export async function setupReminderScheduler() {
   console.log('Setting up daily reminder jobs...');
 
-  cron.schedule('0 0 8 * * 1-5', () => runJobWithUsers(sendReminderToUser, 'Morning'));
-  cron.schedule('0 0 12 * * 1-5', () => runJobWithUsers(sendReminderToUser, 'Noon'));
-  cron.schedule('0 0 16 * * 1-5', () => runJobWithUsers(sendReminderToUser, 'Afternoon'));
+  cron.schedule(
+    '0 0 8 * * 1-5',
+    () => runJobWithUsers(sendReminderToUser, 'Morning'),
+    tzConfig
+  );
+  cron.schedule(
+    '0 0 12 * * 1-5',
+    () => runJobWithUsers(sendReminderToUser, 'Noon'),
+    tzConfig
+  );
+  cron.schedule(
+    '0 0 16 * * 1-5',
+    () => runJobWithUsers(sendReminderToUser, 'Afternoon'),
+    tzConfig
+  );
 
   console.log('Reminder jobs scheduled.');
 }
