@@ -5,6 +5,12 @@ import { IHttpClient, ILineMessenger } from './domain/interfaces';
 import { LineChannelAccessToken } from './types';
 
 export class AxiosHttpClientAdapter implements IHttpClient {
+  async get<T>(url: string, configs?: AxiosRequestConfig): Promise<T> {
+    const response = await axios.get<T>(url, configs);
+
+    return response.data;
+  }
+
   async post<T>(url: string, data: unknown, configs?: AxiosRequestConfig): Promise<T> {
     const response = await axios.post<T>(url, data, configs);
 
@@ -13,25 +19,39 @@ export class AxiosHttpClientAdapter implements IHttpClient {
 }
 
 class LineMessageAdapter implements ILineMessenger {
-  private readonly api: string = 'https://api.line.me/v2/bot/message/push';
+  private readonly api: string = 'https://api.line.me/v2/bot';
+  private readonly headers: Record<string, string>;
 
   constructor(
     private readonly accessToken: LineChannelAccessToken,
     private readonly httpClient: IHttpClient
-  ) {}
+  ) {
+    this.headers = {
+      Authorization: `Bearer ${this.accessToken}`,
+      'Content-Type': 'application/json',
+    };
+  }
+
+  async getProfile<T>(userId: UserId): Promise<T>  {
+    const userProfile = await this.httpClient.get<T>(
+        `${this.api}/profile/${userId}`,
+        {
+          headers: this.headers,
+        }
+      );
+
+    return userProfile;
+  }
 
   async sendMessage(userId: UserId, message: string): Promise<void>  {
     await this.httpClient.post(
-        this.api,
+        `${this.api}/message/push`,
         {
           to: userId,
           messages: [{ type: 'text', text: message }],
         },
         {
-          headers: {
-            Authorization: `Bearer ${this.accessToken}`,
-            'Content-Type': 'application/json',
-          },
+          headers: this.headers,
         }
       );
   }
