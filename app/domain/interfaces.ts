@@ -1,8 +1,14 @@
-import { UserEntity, UserId, WaterLogEntity } from './entities';
+import {
+  UserEntity,
+  UserProfile,
+  UserId,
+  WaterLogEntity,
+} from './entities';
 
 export interface IUserRepository {
   create(user: UserEntity): Promise<void>;
   findById(id: UserId): Promise<UserEntity>;
+  updateProfile(id: UserId, profile: UserProfile): Promise<void>;
   updateWeight(id: UserId, weight: number): Promise<void>;
   updateTargetWater(id: UserId, target: number): Promise<void>;
   getAll(): Promise<UserEntity[]>;
@@ -19,6 +25,6 @@ export interface IHttpClient {
 }
 
 export interface ILineMessenger {
-  getProfile<T>(userId: UserId): Promise<T> 
+  getProfile<T extends UserProfile>(userId: UserId): Promise<T>;
   sendMessage(userId: UserId, message: string): Promise<void> 
 }

@@ -4,6 +4,7 @@ import { users, waterLogs } from './schemas';
 import { sum, equalToday } from './sql-helpers';
 import {
   UserEntity,
+  UserProfile,
   UserId,
   WaterLogEntity,
 } from '../domain/entities';
@@ -19,6 +20,12 @@ export class UserRepository implements IUserRepository {
     await this.db.insert(users)
       .values(user)
       .onConflictDoNothing();
+  }
+
+  async updateProfile(id: UserId, profile: UserProfile) {
+    await this.db.update(users)
+      .set(profile)
+      .where(eq(users.id, id));
   }
 
   async updateWeight(id: UserId, weight: number) {
