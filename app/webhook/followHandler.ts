@@ -1,19 +1,12 @@
 import { FollowEvent } from '@line/bot-sdk';
 import { LinesText } from '../types';
 import { contants, phrases, strings } from '../utils';
-import { createUserService } from '../domain/services';
 
 const { createTextEcho } = strings;
 const { PHRASE_TYPES } = contants;
 const { getPhraseTextByType } = phrases;
 
-const userService = createUserService();
-
 export function handleFollow(event: FollowEvent, client: any) {
-  const {
-    source: { userId },
-  } = event;
-
   const lines: LinesText = [
     '你好咕～我是喝水咕嚕咕嚕地咕咕君 🐣💧',
     '每天都會提醒你補充水分咕！',
@@ -34,8 +27,6 @@ export function handleFollow(event: FollowEvent, client: any) {
     '',
     '未來如果忘記了咕，輸入 help 我就會提醒你摟咕',
   ];
-
-  userId && userService.handleUserCreate(userId);
 
   return client.replyMessage({
     replyToken: event.replyToken,

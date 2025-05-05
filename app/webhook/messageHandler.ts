@@ -1,5 +1,4 @@
 import { MessageEvent } from '@line/bot-sdk';
-import { LineText, LinesText } from '../types';
 import { contants, phrases, strings } from '../utils';
 import { createUserService } from '../domain/services';
 
