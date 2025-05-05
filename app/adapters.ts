@@ -1,8 +1,11 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import type { RequestHandler } from 'express';
+import * as line from '@line/bot-sdk';
 import { getLineChannel } from './configs';
 import { UserId } from './domain/entities';
 import { IHttpClient, ILineMessenger } from './domain/interfaces';
 import { LineChannelAccessToken } from './types';
+import { MessagingApiClient } from '@line/bot-sdk/dist/messaging-api/api';
 
 export class AxiosHttpClientAdapter implements IHttpClient {
   async get<T>(url: string, configs?: AxiosRequestConfig): Promise<T> {
@@ -64,4 +67,19 @@ export function createLineMessageAdapter(): LineMessageAdapter {
     lineChannel.accessToken,
     new AxiosHttpClientAdapter()
   );
+}
+
+const lineMiddlewareConfig: line.MiddlewareConfig = {
+  channelSecret: lineChannel.secret,
+};
+const lineClientConfig: line.ClientConfig = {
+  channelAccessToken: lineChannel.accessToken,
+};
+
+export function createLineMiddleware(): RequestHandler {
+  return line.middleware(lineMiddlewareConfig);
+}
+
+export function createLineClient(): line.messagingApi.MessagingApiClient {
+  return new line.messagingApi.MessagingApiClient(lineClientConfig);
 }

@@ -1,12 +1,16 @@
 import express from 'express';
-import { WebhookEvent } from '@line/bot-sdk';
+import { messagingApi } from '@line/bot-sdk';
+import type { WebhookEvent } from '@line/bot-sdk';
 import { handleFollow } from './followHandler';
 import { handleMessage } from './messageHandler';
 import { createUserService } from '../domain/services';
 
 const userService = createUserService();
 
-async function handleEvent(event: WebhookEvent, client: any) {
+async function handleEvent(
+  event: WebhookEvent,
+  client: messagingApi.MessagingApiClient
+) {
   const {
     type: eventType,
     source: { userId },
@@ -28,7 +32,7 @@ async function handleEvent(event: WebhookEvent, client: any) {
   }
 };
 
-export function createWebhookRouter(client: any) {
+export function createWebhookRouter(client: messagingApi.MessagingApiClient) {
   const router = express.Router();
 
   router.post('/', async (req, res) => {

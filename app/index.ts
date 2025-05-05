@@ -1,26 +1,17 @@
 import express from 'express';
-import * as line from '@line/bot-sdk';
-import { getLineChannel } from './configs';
+import { createLineMiddleware, createLineClient } from './adapters';
 import { createWebhookRouter } from './webhook/router';
 import { setupReminderScheduler } from './schedules/reminder';
 
-const lineChannel = getLineChannel();
-
 const port = process.env.PORT || 3000;
 
-const lineMiddlewareConfig = <line.MiddlewareConfig>{
-  channelSecret: lineChannel.secret,
-};
-const lineClient = new line.messagingApi.MessagingApiClient(
-  <line.ClientConfig>{
-    channelAccessToken: lineChannel.accessToken,
-  }
-);
+const lineMiddleware = createLineMiddleware();
+const lineClient = createLineClient();
 
 const app = express();
 
 app.use('/webhook',
-  line.middleware(lineMiddlewareConfig),
+  lineMiddleware,
   createWebhookRouter(lineClient)
 );
 
