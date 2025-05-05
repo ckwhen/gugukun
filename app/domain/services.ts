@@ -1,13 +1,19 @@
 import {
   UserEntity,
+  UserProfile,
   UserId,
   UserDailyWaterProgress,
   WaterLogEntity,
 } from './entities';
 import { db } from '../db/client';
 import { UserRepository, WaterLogRepository } from '../db/repositories';
-import { IUserRepository, IWaterLogRepository } from './interfaces';
+import {
+  IUserRepository,
+  IWaterLogRepository,
+  ILineMessenger,
+} from './interfaces';
 import { RuleMatch, EventTextMessage } from '../types';
+import { createLineMessageAdapter } from '../adapters';
 import { contants } from '../utils';
 
 const { rules, AMOUNT_PER_WEIGHT } = contants;
@@ -15,8 +21,36 @@ const { rules, AMOUNT_PER_WEIGHT } = contants;
 class UserService {
   constructor(
     private readonly userRepo: IUserRepository,
-    private readonly waterLogRepo: IWaterLogRepository
+    private readonly waterLogRepo: IWaterLogRepository,
+    private readonly lineMessenger: ILineMessenger
   ) {}
+
+  async ensureUserExists(userId: string) {
+    const user = await this.userRepo.findById(userId);
+    const profile = await this.lineMessenger.getProfile(userId);
+
+    if (!user) {
+      const userWithProfile: UserEntity & UserProfile = {
+        id: userId,
+        displayName: profile.displayName,
+        pictureUrl: profile.pictureUrl,
+        statusMessage: profile.statusMessage,
+        language: profile.language,
+      };
+
+      await this.userRepo.create(userWithProfile);
+      console.log(`[UserService] 新增使用者 ${userId} `);
+    } else {
+      const updatedProfile: UserProfile = {
+        displayName: profile.displayName,
+        pictureUrl: profile.pictureUrl,
+        statusMessage: profile.statusMessage,
+        language: profile.language,
+      };
+      await this.userRepo.updateProfile(userId, updatedProfile);
+      console.log(`[UserService] 更新使用者 ${userId} 的資料`);
+    }
+  }
 
   async handleUserCreate(userId: UserId) {
     await this.userRepo.create(<UserEntity>{ id: userId });
@@ -87,8 +121,13 @@ class UserService {
 export function createUserService(): UserService {
   const userRepo = new UserRepository(db);
   const waterLogRepo = new WaterLogRepository(db);
+  const lineMessenger = createLineMessageAdapter();
 
-  return new UserService(userRepo, waterLogRepo);
+  return new UserService(
+    userRepo,
+    waterLogRepo,
+    lineMessenger
+  );
 }
 
 class ReminderService {
