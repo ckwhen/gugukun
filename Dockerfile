@@ -29,3 +29,5 @@ RUN pnpm install --frozen-lockfile
 COPY --from=builder /app/dist ./app
 COPY --from=builder /app/migrations ./migrations
 COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
+
+CMD ["npm", "start"]

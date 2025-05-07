@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon ./app/index.ts",
     "build": "tsc",
+    "start": "node app/index.js",
     "db:migrate": "drizzle-kit migrate",
     "db:generate": "drizzle-kit generate",
     "db:seed": "ts-node ./app/db/seeds.ts"
