@@ -28,6 +28,7 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_PORT=${DB_PORT}
       - DB_NAME=${DB_NAME}
+      - DB_URL=${DB_URL}
     depends_on:
       - db
     command: [
@@ -48,6 +49,7 @@ services:
       - LINE_CHANNEL_SECRET=${LINE_CHANNEL_SECRET}
       - LINE_CHANNEL_ACCESS_TOKEN=${LINE_CHANNEL_ACCESS_TOKEN}
       - REMINDER_SECRET_KEY=${REMINDER_SECRET_KEY}
+      - DB_URL=${DB_URL}
     ports:
       - "3000:3000"
     depends_on:
@@ -55,7 +57,7 @@ services:
         condition: service_healthy
     command: [
       "bash", "-c",
-      "sleep 5 && node app/index.js"
+      "sleep 5 && npm start"
     ]
 
 volumes:

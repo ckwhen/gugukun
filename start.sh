@@ -4,9 +4,9 @@ ENV=""
 
 # 根據命令行參數選擇環境
 if [ "$1" == "development" ]; then
-  ENV="development"
+  ENV="development.local"
 elif [ "$1" == "production" ]; then
-  ENV="production"
+  ENV="production.local"
 elif [ "$1" == "local" ]; then
   ENV="local"
 else
