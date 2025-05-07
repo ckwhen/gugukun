@@ -29,9 +29,9 @@ async function runJobWithUsers(jobFn: (userId: UserId) => Promise<void>, label: 
   console.log(`[${label}] Job done at`, new Date().toLocaleTimeString());
 }
 
-export const reminder = express.Router();
+export const router = express.Router();
 
-reminder.get('/', async (req, res) => {
+router.get('/', async (req, res) => {
   const secret = req.headers['x-cron-secret'];
 
   if (secret !== process.env.REMINDER_SECRET_KEY) {
