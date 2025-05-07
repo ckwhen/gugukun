@@ -1,6 +1,6 @@
 import { MessageEvent, FlexMessage, TextMessage } from '@line/bot-sdk';
-import { contants, phrases } from '../utils';
-import { createUserService } from '../domain/services';
+import { contants, phrases } from '../../utils';
+import { createUserService } from '../../domain/services';
 import { getProgressBubbleMessage, ReplyMessageRequestType } from './utils';
 
 const { PHRASE_TYPES } = contants;
@@ -66,11 +66,10 @@ export async function handleMessage(
   }
 
   if (phraseType === PHRASE_TYPES.GET_HELP) {
-    messages[0].text = `
-      咕咕～咕咕君來提醒你摟咕
-      只要輸入 help 我都會出現喔咕
+    messages[0].text = `咕咕～咕咕君來提醒你摟咕
+只要輸入 help 我都會出現喔咕
 
-      ${getPhraseTextByType(phraseType)}
+${getPhraseTextByType(phraseType)}
     `;
   }
 
