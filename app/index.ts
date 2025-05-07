@@ -1,7 +1,6 @@
 import express from 'express';
 import { createLineMiddleware, createLineClient } from './adapters';
 import { createWebhookRouter } from './webhook/router';
-import { setupReminderScheduler } from './schedules/reminder';
 
 const port = process.env.PORT || 3000;
 
@@ -16,6 +15,5 @@ app.use('/webhook',
 );
 
 app.listen(port, () => {
-  console.log(`咕咕君已啟動在 http://localhost:${port} 咕！`);
-  setupReminderScheduler();
+  console.log(`咕咕君正在監聽 port:${port} 了咕！`);
 });
