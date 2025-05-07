@@ -1,14 +1,15 @@
 import express from 'express';
 import type { WebhookEvent } from '@line/bot-sdk';
+import { createLineClient } from '../../adapters';
 import { createUserService } from '../../domain/services';
 import { handleFollow } from './followHandler';
 import { handleMessage } from './messageHandler';
-import {
-  MessagingApiClientType,
-  ReplyMessageRequestType,
-} from './utils';
+import { ReplyMessageRequestType } from './utils';
 
 const userService = createUserService();
+const lineClient = createLineClient();
+
+export const router = express.Router();
 
 async function handleEvent(
   event: WebhookEvent
@@ -34,28 +35,22 @@ async function handleEvent(
   }
 };
 
-export function createWebhookRouter(client: MessagingApiClientType) {
-  const router = express.Router();
+router.post('/', async (req, res) => {
+  const events = req.body.events;
+  await Promise.all(
+      events.map(async (event: WebhookEvent) => {
+        const reply = await handleEvent(event);
 
-  router.post('/', async (req, res) => {
-    const events = req.body.events;
-    await Promise.all(
-        events.map(async (event: WebhookEvent) => {
-          const reply = await handleEvent(event);
+        if (!reply) {
+          return null;
+        }
 
-          if (!reply) {
-            return null;
-          }
-
-          return client.replyMessage(reply);
-        })
-      )
-      .then((result) => res.json(result))
-      .catch((err) => {
-        console.error(err);
-        res.status(500).end();
-      });
-  });
-
-  return router;
-}
+        return lineClient.replyMessage(reply);
+      })
+    )
+    .then((result) => res.json(result))
+    .catch((err) => {
+      console.error(err);
+      res.status(500).end();
+    });
+});
