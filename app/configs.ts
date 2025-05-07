@@ -3,15 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export function getDatabaseUrl() {
-  const {
-    DB_USER,
-    DB_PASSWORD,
-    DB_PORT,
-    DB_NAME,
-    DB_HOST = 'localhost',
-  } = process.env;
-
-  return `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`;
+  return `${process.env.DB_URL}`;
 }
 
 export function getLineChannel() {
