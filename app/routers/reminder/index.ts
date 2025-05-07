@@ -36,6 +36,7 @@ router.post('/', async (req, res) => {
 
   if (secret !== process.env.REMINDER_SECRET_KEY) {
     res.status(403).send('Forbidden');
+    return;
   }
 
   const slot = req.body.slot as string || '';
