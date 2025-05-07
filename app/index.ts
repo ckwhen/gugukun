@@ -15,5 +15,5 @@ app.use('/webhook',
 );
 
 app.listen(port, () => {
-  console.log(`咕咕君已啟動在 http://localhost:${port} 咕！`);
+  console.log(`咕咕君正在監聽 port:${port} 了咕！`);
 });
