@@ -31,14 +31,14 @@ async function runJobWithUsers(jobFn: (userId: UserId) => Promise<void>, label: 
 
 export const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.post('/', async (req, res) => {
   const secret = req.headers['x-cron-secret'];
 
   if (secret !== process.env.REMINDER_SECRET_KEY) {
     res.status(403).send('Forbidden');
   }
 
-  const slot = req.query.slot as string || '';
+  const slot = req.body.slot as string || '';
 
   await runJobWithUsers(sendReminderToUser, slot);
 
