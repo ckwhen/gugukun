@@ -1,9 +1,8 @@
-import { MessageEvent } from '@line/bot-sdk';
-import { contants, phrases, strings } from '../utils';
+import { MessageEvent, FlexMessage, TextMessage } from '@line/bot-sdk';
+import { contants, phrases } from '../utils';
 import { createUserService } from '../domain/services';
 import { getProgressBubbleMessage, ReplyMessageRequestType } from './utils';
 
-const { createTextEcho } = strings;
 const { PHRASE_TYPES } = contants;
 const { getPhraseTextByType, checkPhraseTypeByMessage } = phrases;
 
@@ -23,9 +22,13 @@ export async function handleMessage(
 
   const { text: messageText } = message;
   const phraseType = checkPhraseTypeByMessage(messageText);
-  const messages = [];
+  const messages: TextMessage[] = [];
+  const flexMessages: FlexMessage[] = [];
 
-  messages.push(getPhraseTextByType(phraseType));
+  messages.push({
+    type: 'text',
+    text: getPhraseTextByType(phraseType),
+  } as TextMessage);
 
   if (userId && phraseType === PHRASE_TYPES.SET_GOAL) {
     userService.handleUserSetting(userId, messageText);
@@ -34,13 +37,15 @@ export async function handleMessage(
   if (userId && phraseType === PHRASE_TYPES.CHECK_GOAL) {
     const user = await userService.handleUserFind(userId);
 
-    messages[0] = getPhraseTextByType(phraseType, { cc: user?.targetWater });
+    messages[0].text = getPhraseTextByType(phraseType, { cc: user.targetWater ?? 0 });
   }
 
   if (userId && phraseType === PHRASE_TYPES.RECORD_WATER) {
     const amount = await userService.handleWaterLogCreate(userId, messageText);
 
-    messages[0] = getPhraseTextByType(phraseType, { cc: amount });
+    messages[0].text = getPhraseTextByType(phraseType, {
+      cc: amount,
+    });
   }
 
   if (userId && phraseType === PHRASE_TYPES.CHECK_CURRENT) {
@@ -50,28 +55,27 @@ export async function handleMessage(
       targetWater,
       totalWaterToday,
     } = progress;
-
-    messages[0] = getPhraseTextByType(phraseType, { cc: totalWaterToday });
-    messages.push(getProgressBubbleMessage({
+    const progressText = getProgressBubbleMessage({
       percentage,
       totalWaterToday,
       targetWater: targetWater ?? 0,
-    }));
+    }) as FlexMessage;
+
+    messages[0].text = getPhraseTextByType(phraseType, { cc: totalWaterToday });
+    flexMessages.push(progressText);
   }
 
   if (phraseType === PHRASE_TYPES.GET_HELP) {
-    messages[0] = [
-      '咕咕～咕咕君來提醒你摟咕',
-      '只要輸入 help 我都會出現喔咕',
-      '',
-      getPhraseTextByType(phraseType),
-    ];
-  }
+    messages[0].text = `
+      咕咕～咕咕君來提醒你摟咕
+      只要輸入 help 我都會出現喔咕
 
-  const [ commonText, ...rest ] = messages;
+      ${getPhraseTextByType(phraseType)}
+    `;
+  }
 
   return Promise.resolve({
     replyToken: event.replyToken,
-    messages: [ createTextEcho(commonText), ...rest ],
+    messages: [ ...messages, ...flexMessages ] as any[],
   });
 };

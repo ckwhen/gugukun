@@ -11,7 +11,7 @@ const {
   GET_HELP,
 } = PHRASE_TYPES;
 
-const PHRASES = new Map<number, string[]>();
+const PHRASES = new Map<PHRASE_TYPES, string[]>();
 
 PHRASES.set(SET_GOAL, [
   '飲水目標設定好了咕！我會盯著你喝的咕～',
@@ -80,7 +80,7 @@ PHRASES.set(GET_HELP, [
   👉 設定 60kg（咕咕君會自動計算目標咕）`,
 ]);
 
-function getRandom(arr: any) {
+function getRandom(arr: string[]) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
@@ -96,12 +96,18 @@ export function checkPhraseTypeByMessage(message = '') {
   return DEFAULT;
 }
 
-export function getPhraseTextByType(type = DEFAULT, params = {}) {
-  const list = PHRASES.get(type) || PHRASES.get(DEFAULT);
+interface PhraseTextParams {
+  [key: string]: string | number;
+}
+export function getPhraseTextByType(
+  type: PHRASE_TYPES = DEFAULT,
+  params: PhraseTextParams = {}
+) {
+  const list = PHRASES.get(type) || PHRASES.get(DEFAULT) || [];
   let text = getRandom(list);
 
   for (const [key, value] of Object.entries(params)) {
-    text = text.replace(`\${${key}}`, value);
+    text = text.replace(`\${${key}}`, value + '');
   }
 
   return text;
