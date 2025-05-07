@@ -67,7 +67,17 @@ PHRASES.set(DEFAULT, [
 ]);
 
 PHRASES.set(GET_HELP, [
-  '紀錄你了多少的水咕：\n👉 喝水 {xxx}cc\n👉 喝了 {xxx}cc\n查詢今日進度咕：\n👉 進度\n查詢你的每日目標咕：\n👉 查詢\n👉 目標',
+  `紀錄你了多少的水咕：
+  👉 喝水 {xxx}cc
+  👉 喝了 {xxx}cc
+  查詢今日進度咕：
+  👉 進度
+  查詢你的每日目標咕：
+  👉 查詢
+  👉 目標
+  設定目標咕：
+  👉 設定 2000cc
+  👉 設定 60kg（咕咕君會自動計算目標咕）`,
 ]);
 
 function getRandom(arr: any) {
