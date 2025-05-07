@@ -3,10 +3,15 @@ FROM node:23-alpine as builder
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+# 安裝 pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+COPY package.json pnpm-lock.yaml ./
+
+RUN pnpm install --frozen-lockfile
 
 COPY . .
+
 RUN npm run build
 
 # Production Stage
@@ -16,8 +21,10 @@ RUN apk update && apk add bash
 
 WORKDIR /app
 
-COPY --from=builder /app/package*.json ./
-RUN npm install
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
 COPY --from=builder /app/dist ./app
 COPY --from=builder /app/migrations ./migrations
