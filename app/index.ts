@@ -1,4 +1,5 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 import { createLineMiddleware } from './adapters';
 import { router as webhookRouter } from './routers/webhook';
 import { router as reminderRouter } from './routers/reminder';
@@ -8,6 +9,8 @@ const port = process.env.PORT || 3000;
 const lineMiddleware = createLineMiddleware();
 
 const app = express();
+
+app.use(bodyParser.urlencoded())
 
 app.use('/webhook', lineMiddleware, webhookRouter);
 app.use('/reminder', reminderRouter);
