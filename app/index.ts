@@ -1,6 +1,6 @@
 import express from 'express';
 import { createLineMiddleware, createLineClient } from './adapters';
-import { createWebhookRouter } from './webhook/router';
+import { createWebhookRouter } from './routers/webhook';
 import { reminder as reminderRoute } from './routers/reminder';
 
 const port = process.env.PORT || 3000;

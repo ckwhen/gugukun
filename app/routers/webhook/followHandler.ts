@@ -1,5 +1,5 @@
 import { FollowEvent } from '@line/bot-sdk';
-import { contants, phrases } from '../utils';
+import { contants, phrases } from '../../utils';
 import { ReplyMessageRequestType } from './utils';
 
 const { PHRASE_TYPES } = contants;

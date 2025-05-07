@@ -1,8 +1,8 @@
 import express from 'express';
 import type { WebhookEvent } from '@line/bot-sdk';
+import { createUserService } from '../../domain/services';
 import { handleFollow } from './followHandler';
 import { handleMessage } from './messageHandler';
-import { createUserService } from '../domain/services';
 import {
   MessagingApiClientType,
   ReplyMessageRequestType,
