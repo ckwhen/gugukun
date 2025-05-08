@@ -10,7 +10,7 @@ const lineMiddleware = createLineMiddleware();
 
 const app = express();
 
-app.use(bodyParser.urlencoded())
+app.use(bodyParser.urlencoded());
 
 app.use('/webhook', lineMiddleware, webhookRouter);
 app.use('/reminder', reminderRouter);

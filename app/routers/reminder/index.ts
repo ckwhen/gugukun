@@ -32,9 +32,10 @@ async function runJobWithUsers(jobFn: (userId: UserId) => Promise<void>, label: 
 export const router = express.Router();
 
 router.post('/', async (req, res) => {
-  const secret = req.headers['x-cron-secret'];
+  const rawSecret = req.headers['x-cron-secret'];
+  const secret = Array.isArray(rawSecret) ? rawSecret[0] : rawSecret;
 
-  if (secret !== process.env.REMINDER_SECRET_KEY) {
+  if (secret?.trim() !== process.env.REMINDER_SECRET_KEY?.trim()) {
     res.status(403).send('Forbidden');
     return;
   }
