@@ -7,6 +7,7 @@ import {
 } from './entities';
 import { db } from '../db/client';
 import { UserRepository, WaterLogRepository } from '../db/repositories';
+import { ServiceError } from '../errors';
 import {
   IUserRepository,
   IWaterLogRepository,
@@ -26,95 +27,115 @@ class UserService {
   ) {}
 
   async ensureUserExists(userId: string) {
-    const user = await this.userRepo.findById(userId);
-    const profile = await this.lineMessenger.getProfile(userId);
+    try {
+      const user = await this.userRepo.findById(userId);
+      const profile = await this.lineMessenger.getProfile(userId);
 
-    if (!user) {
-      const userWithProfile: UserEntity & UserProfile = {
-        id: userId,
-        displayName: profile.displayName,
-        pictureUrl: profile.pictureUrl,
-        statusMessage: profile.statusMessage,
-        language: profile.language,
-      };
+      if (!user) {
+        const userWithProfile: UserEntity & UserProfile = {
+          id: userId,
+          displayName: profile.displayName,
+          pictureUrl: profile.pictureUrl,
+          statusMessage: profile.statusMessage,
+          language: profile.language,
+        };
 
-      await this.userRepo.create(userWithProfile);
-      console.log(`[UserService] 新增使用者 ${userId} `);
-    } else {
-      const updatedProfile: UserProfile = {
-        displayName: profile.displayName,
-        pictureUrl: profile.pictureUrl,
-        statusMessage: profile.statusMessage,
-        language: profile.language,
-      };
-      await this.userRepo.updateProfile(userId, updatedProfile);
-      console.log(`[UserService] 更新使用者 ${userId} 的資料`);
+        await this.userRepo.create(userWithProfile);
+      } else {
+        const updatedProfile: UserProfile = {
+          displayName: profile.displayName,
+          pictureUrl: profile.pictureUrl,
+          statusMessage: profile.statusMessage,
+          language: profile.language,
+        };
+        await this.userRepo.updateProfile(userId, updatedProfile);
+      }
+    } catch (err) {
+      throw new ServiceError('Failed to ensure user exists', err);
     }
-  }
-
-  async handleUserCreate(userId: UserId) {
-    await this.userRepo.create(<UserEntity>{ id: userId });
   }
 
   async handleUserFind(userId: UserId) {
-    const user = await this.userRepo.findById(userId);
+    try {
+      const user = await this.userRepo.findById(userId);
 
-    return user;
+      return user;
+    } catch (err) {
+      throw new ServiceError('Failed to handle user find', err);
+    }
   }
 
   async handleUserSetting(userId: UserId, message: EventTextMessage) {
-    const match: RuleMatch = message.match(rules.setting);
-    let amount = 0;
-    let unit = 'cc';
-    let targetWater = 0;
+    try {
+      const match: RuleMatch = message.match(rules.setting);
+      let amount = 0;
+      let unit = 'cc';
+      let targetWater = 0;
 
-    if (match) {
-      amount = parseFloat(match[1]);
-      unit = match[2];
+      if (match) {
+        amount = parseFloat(match[1]);
+        unit = match[2];
+      }
+
+      if (unit === 'cc') {
+        targetWater = amount;
+      }
+
+      if (unit === 'kg') {
+        targetWater = AMOUNT_PER_WEIGHT * amount;
+
+        await this.userRepo.updateWeight(userId, amount);
+      }
+
+      await this.userRepo.updateTargetWater(userId, targetWater);
+    } catch (err) {
+      throw new ServiceError('Failed to handle user setting', err);
     }
-
-    if (unit === 'cc') {
-      targetWater = amount;
-    }
-
-    if (unit === 'kg') {
-      targetWater = AMOUNT_PER_WEIGHT * amount;
-
-      await this.userRepo.updateWeight(userId, amount);
-    }
-
-    await this.userRepo.updateTargetWater(userId, targetWater);
   }
 
   async handleWaterLogCreate(userId: UserId, message: EventTextMessage) {
-    const match: RuleMatch = message.match(rules.waterRecording);
-    let amount = 0;
+    try {
+      const match: RuleMatch = message.match(rules.waterRecording);
+      let amount = 0;
 
-    if (match) {
-      amount = parseFloat(match[2]);
+      if (match) {
+        amount = parseFloat(match[2]);
+      }
+
+      const logAmount = await this.waterLogRepo.create(<WaterLogEntity>{ userId, amount });
+
+      return logAmount;
+    } catch (err) {
+      throw new ServiceError(
+        'Failed to handle user water log create',
+        err
+      );
     }
-
-    const logAmount = await this.waterLogRepo.create(<WaterLogEntity>{ userId, amount });
-
-    return logAmount;
   }
 
   async handleUserWaterProgress(userId: UserId): Promise<UserDailyWaterProgress> {
-    const user = await this.userRepo.findById(userId);
-    const todayWaterLogs = await this.waterLogRepo.getTodayWaterLogs(userId);
+    try {
+      const user = await this.userRepo.findById(userId);
+      const todayWaterLogs = await this.waterLogRepo.getTodayWaterLogs(userId);
 
-    const targetWater = user.targetWater ?? 0;
-    const totalWaterToday = todayWaterLogs
-      .reduce((total, log) => total + log.amount, 0);
+      const targetWater = user.targetWater ?? 0;
+      const totalWaterToday = todayWaterLogs
+        .reduce((total, log) => total + log.amount, 0);
 
-    const progress: UserDailyWaterProgress = {
-      totalWaterToday,
-      id: user.id,
-      targetWater: targetWater,
-      percentage: ((totalWaterToday * 100) / targetWater).toFixed(2) + '%',
-    };
+      const progress: UserDailyWaterProgress = {
+        totalWaterToday,
+        id: user.id,
+        targetWater: targetWater,
+        percentage: ((totalWaterToday * 100) / targetWater).toFixed(2) + '%',
+      };
 
-    return progress;
+      return progress;
+    } catch (err) {
+      throw new ServiceError(
+        'Failed to handle user daily water progress',
+        err
+      );
+    }
   }
 }
 
@@ -136,9 +157,13 @@ class ReminderService {
   ) {}
 
   async getAllUsers() {
-    const users = await this.userRepo.getAll();
+    try {
+      const users = await this.userRepo.getAll();
 
-    return users;
+      return users;
+    } catch (err) {
+      throw new ServiceError('Failed to get all users', err);
+    }
   }
 }
 

@@ -2,6 +2,10 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+export function getLogLevel() {
+  return process.env.LOG_LEVEL;
+}
+
 export function getDatabaseUrl() {
   return `${process.env.DB_URL}`;
 }

@@ -1,9 +1,15 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import type { RequestHandler } from 'express';
 import * as line from '@line/bot-sdk';
+import type { Logger as WinstonLogger } from 'winston';
+import { logger } from './libs/logger';
 import { getLineChannel } from './configs';
 import { UserId } from './domain/entities';
-import { IHttpClient, ILineMessenger } from './domain/interfaces';
+import {
+  IHttpClient,
+  ILineMessenger,
+  ILogger,
+} from './domain/interfaces';
 import { LineChannelAccessToken } from './types';
 import { MessagingApiClient } from '@line/bot-sdk/dist/messaging-api/api';
 
@@ -82,4 +88,24 @@ export function createLineMiddleware(): RequestHandler {
 
 export function createLineClient(): MessagingApiClient {
   return new line.messagingApi.MessagingApiClient(lineClientConfig);
+}
+
+class WinstonLoggerAdapter implements ILogger {
+  constructor(private readonly logger: WinstonLogger) {}
+
+  info(message: string, meta?: Record<string, any>) {
+    this.logger.info(message, meta);
+  }
+
+  warn(message: string, meta?: Record<string, any>) {
+    this.logger.warn(message, meta);
+  }
+
+  error(message: string, meta?: Record<string, any>) {
+    this.logger.error(message, meta);
+  }
+}
+
+export function createLogger(): ILogger {
+  return new WinstonLoggerAdapter(logger);
 }
