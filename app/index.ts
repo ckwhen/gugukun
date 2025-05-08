@@ -12,11 +12,6 @@ const app = express();
 
 app.use(bodyParser.urlencoded());
 
-app.use((req, res, next) => {
-  console.log('Received headers:', req.headers);
-  next();
-});
-
 app.use('/webhook', lineMiddleware, webhookRouter);
 app.use('/reminder', reminderRouter);
 

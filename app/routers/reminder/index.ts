@@ -35,8 +35,6 @@ router.post('/', async (req, res) => {
   const rawSecret = req.headers['x-cron-secret'];
   const secret = Array.isArray(rawSecret) ? rawSecret[0] : rawSecret;
 
-  console.log('[router][post]', secret);
-
   if (secret?.trim() !== process.env.REMINDER_SECRET_KEY?.trim()) {
     res.status(403).send('Forbidden');
     return;
