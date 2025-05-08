@@ -2,55 +2,68 @@ import express from 'express';
 import type { WebhookEvent } from '@line/bot-sdk';
 import { createLineClient } from '../../adapters';
 import { createUserService } from '../../domain/services';
+import { ILogger } from '../../domain/interfaces';
 import { handleFollow } from './followHandler';
 import { handleMessage } from './messageHandler';
 import { ReplyMessageRequestType } from './utils';
 
-const userService = createUserService();
-const lineClient = createLineClient();
+export function createRouter(logger: ILogger) {
+  const router = express.Router();
+  const userService = createUserService();
+  const lineClient = createLineClient();
 
-export const router = express.Router();
+  async function handleEvent(
+    event: WebhookEvent
+  ): Promise<ReplyMessageRequestType | null> {
+    const {
+      type: eventType,
+      source: { userId },
+    } = event;
 
-async function handleEvent(
-  event: WebhookEvent
-): Promise<ReplyMessageRequestType | null> {
-  const {
-    type: eventType,
-    source: { userId },
-  } = event;
+    if (!userId) {
+      throw new Error('userId is required to ensure user existence');
+    }
 
-  if (!userId) {
-    throw new Error('userId is required to ensure user existence');
-  }
+    try {
+      await userService.ensureUserExists(userId);
+    } catch (err) {
+      logger.error('Failed to ensure user exists', { userId, error: err });
+      return null;
+    }
 
-  await userService.ensureUserExists(userId);
+    switch (eventType) {
+      case 'follow':
+        return handleFollow(event);
+      case 'message':
+        return handleMessage(event);
+      default:
+        return Promise.resolve(null);
+    }
+  };
 
-  switch (eventType) {
-    case 'follow':
-      return handleFollow(event);
-    case 'message':
-      return handleMessage(event);
-    default:
-      return Promise.resolve(null);
-  }
-};
+  router.post('/', async (req, res) => {
+    const events = req.body.events;
+    const results = await Promise.all(
+        events.map(async (event: WebhookEvent) => {
+          try {
+            const reply = await handleEvent(event);
+            if (!reply) return null;
 
-router.post('/', async (req, res) => {
-  const events = req.body.events;
-  await Promise.all(
-      events.map(async (event: WebhookEvent) => {
-        const reply = await handleEvent(event);
+            await lineClient.replyMessage(reply);
+            return { status: 'success', userId: event.source?.userId };
+          } catch (err) {
+            logger.error('Error handling webhook event', {
+              error: err,
+              eventType: event.type,
+              userId: event.source?.userId,
+            });
+            return { status: 'failed', userId: event.source?.userId };
+          }
+        })
+      );
 
-        if (!reply) {
-          return null;
-        }
+    res.json(results);
+  });
 
-        return lineClient.replyMessage(reply);
-      })
-    )
-    .then((result) => res.json(result))
-    .catch((err) => {
-      console.error(err);
-      res.status(500).end();
-    });
-});
+  return router;
+}

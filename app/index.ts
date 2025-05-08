@@ -1,20 +1,21 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import { createLineMiddleware } from './adapters';
-import { router as webhookRouter } from './routers/webhook';
-import { router as reminderRouter } from './routers/reminder';
+import { createLineMiddleware, createLogger } from './adapters';
+import { createRouter as createWebhookRouter } from './routers/webhook';
+import { createRouter as createReminderRouter } from './routers/reminder';
 
 const port = process.env.PORT || 3000;
 
 const lineMiddleware = createLineMiddleware();
+const logger = createLogger();
 
 const app = express();
 
 app.use(bodyParser.urlencoded());
 
-app.use('/webhook', lineMiddleware, webhookRouter);
-app.use('/reminder', reminderRouter);
+app.use('/webhook', lineMiddleware, createWebhookRouter(logger));
+app.use('/reminder', createReminderRouter(logger));
 
 app.listen(port, () => {
-  console.log(`咕咕君正在監聽 port:${port} 了咕！`);
+  logger.info(`gugukun is listening port:${port}`);
 });
