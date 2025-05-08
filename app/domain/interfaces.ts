@@ -28,3 +28,9 @@ export interface ILineMessenger {
   getProfile<T extends UserProfile>(userId: UserId): Promise<T>;
   sendMessage(userId: UserId, message: string): Promise<void> 
 }
+
+export interface ILogger {
+  info(message: string, meta?: Record<string, unknown>): void;
+  warn(message: string, meta?: Record<string, unknown>): void;
+  error(message: string, meta?: Record<string, unknown>): void;
+}
