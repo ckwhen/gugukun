@@ -34,6 +34,8 @@ export const router = express.Router();
 router.post('/', async (req, res) => {
   const secret = req.headers['x-cron-secret'];
 
+  console.log('[router][post]', secret);
+
   if (secret !== process.env.REMINDER_SECRET_KEY) {
     res.status(403).send('Forbidden');
     return;
