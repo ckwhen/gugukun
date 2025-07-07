@@ -50,7 +50,6 @@ export function createRouter(logger: ILogger) {
       res.status(200).send('Reminder triggered!');
     } catch (err) {
       logger.error('Failed to execute reminder job', {
-        error: err,
         ip: req.ip,
         body: req.body,
       });
